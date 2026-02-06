@@ -157,7 +157,7 @@ export const Providers = [
   {
     identifier: 'moltbook',
     component: MoltbookProvider,
-  }
+  },
 ];
 export const ShowAllProviders = forwardRef((props, ref) => {
   const { date, current, global, selectedIntegrations, allIntegrations } =
@@ -221,22 +221,24 @@ export const ShowAllProviders = forwardRef((props, ref) => {
           )}
         </IntegrationContext.Provider>
       )}
-      {selectedIntegrations.map((integration) => {
-        const { component: ProviderComponent } = Providers.find(
-          (provider) =>
-            provider.identifier === integration.integration.identifier
-        ) || {
-          component: Empty,
-        };
+      {selectedIntegrations
+        .filter((integration) => integration?.integration)
+        .map((integration) => {
+          const identifier =
+            integration.integration?.identifier ?? 'x';
+          const { component: ProviderComponent } =
+            Providers.find(
+              (provider) => provider.identifier === identifier
+            ) || { component: Empty };
 
-        return (
-          <ProviderComponent
-            ref={integration.ref}
-            key={integration.integration.id}
-            id={integration.integration.id}
-          />
-        );
-      })}
+          return (
+            <ProviderComponent
+              ref={integration.ref}
+              key={integration.integration.id}
+              id={integration.integration.id}
+            />
+          );
+        })}
     </div>
   );
 });

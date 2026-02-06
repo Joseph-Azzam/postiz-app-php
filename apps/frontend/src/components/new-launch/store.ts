@@ -167,9 +167,10 @@ export const useLaunchStore = create<StoreState>()((set) => ({
     integration: Integrations,
     settings: any
   ) => {
+    if (!integration?.id) return;
     set((state) => {
       const existing = state.selectedIntegrations.find(
-        (i) => i.integration.id === integration.id
+        (i) => i?.integration?.id === integration.id
       );
 
       if (existing) {
@@ -220,17 +221,19 @@ export const useLaunchStore = create<StoreState>()((set) => ({
   addInternalValue: (index: number, integrationId: string, value: Values[]) =>
     set((state) => {
       const integrationIndex = state.internal.findIndex(
-        (i) => i.integration.id === integrationId
+        (i) => i?.integration?.id === integrationId
       );
 
+      const selected = state.selectedIntegrations.find(
+        (i) => i?.integration?.id === integrationId
+      );
       if (integrationIndex === -1) {
+        if (!selected?.integration) return state;
         return {
           internal: [
             ...state.internal,
             {
-              integration: state.selectedIntegrations.find(
-                (i) => i.integration.id === integrationId
-              )!.integration,
+              integration: selected.integration,
               integrationValue: value,
             },
           ],
@@ -277,7 +280,7 @@ export const useLaunchStore = create<StoreState>()((set) => ({
     set((state) => {
       return {
         internal: state.internal.map((item) => {
-          if (item.integration.id === integrationId) {
+          if (item?.integration?.id === integrationId) {
             // Preserve the IDs at their current positions
             const ids = item.integrationValue.map((v) => v.id);
 
@@ -301,19 +304,21 @@ export const useLaunchStore = create<StoreState>()((set) => ({
   addRemoveInternal: (integrationId: string) =>
     set((state) => {
       const integration = state.selectedIntegrations.find(
-        (i) => i.integration.id === integrationId
+        (i) => i?.integration?.id === integrationId
       );
       const findIntegrationIndex = state.internal.findIndex(
-        (i) => i.integration.id === integrationId
+        (i) => i?.integration?.id === integrationId
       );
 
       if (findIntegrationIndex > -1) {
         return {
           internal: state.internal.filter(
-            (i) => i.integration.id !== integrationId
+            (i) => i?.integration?.id !== integrationId
           ),
         };
       }
+
+      if (!integration?.integration) return state;
 
       return {
         internal: [
@@ -562,7 +567,7 @@ export const useLaunchStore = create<StoreState>()((set) => ({
   setInternalValue: (integrationId: string, value: Values[]) =>
     set((state) => ({
       internal: state.internal.map((item) =>
-        item.integration.id === integrationId
+        item?.integration?.id === integrationId
           ? { ...item, integrationValue: value }
           : item
       ),
@@ -578,7 +583,7 @@ export const useLaunchStore = create<StoreState>()((set) => ({
   ) =>
     set((state) => ({
       internal: state.internal.map((item) =>
-        item.integration.id === integrationId
+        item?.integration?.id === integrationId
           ? {
               ...item,
               integrationValue: item.integrationValue.map((v, i) =>

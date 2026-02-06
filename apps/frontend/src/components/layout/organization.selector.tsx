@@ -20,12 +20,14 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
     refreshWhenHidden: false,
     revalidateOnReconnect: false,
   });
+  // Laravel backend may not implement /user/organizations; ensure we always have an array (Postiz upstream compatibility)
+  const list = Array.isArray(data) ? data : [];
   const current = useMemo(() => {
-    return data?.find((d: any) => d.id === user?.orgId);
-  }, [data]);
+    return list.find((d: any) => d.id === user?.orgId);
+  }, [list, user?.orgId]);
   const withoutCurrent = useMemo(() => {
-    return data?.filter((d: any) => d.id !== user?.orgId);
-  }, [current, data]);
+    return list.filter((d: any) => d.id !== user?.orgId);
+  }, [list, user?.orgId]);
   const changeOrg = useCallback(
     (org: { name: string; id: string }) => async () => {
       await fetch('/user/change-org', {
@@ -38,7 +40,7 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
     },
     []
   );
-  if (isLoading || (!isLoading && data?.length === 1)) {
+  if (isLoading || (!isLoading && list.length === 1)) {
     return null;
   }
   return (
@@ -51,7 +53,6 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
           {!asOpenSelect && (
             <div className="flex items-center">
               <svg
-                className={user?.tier.current === 'FREE' ? 'animate-bounce drop-shadow-glow': ''}
                 width="24"
                 height="24"
                 viewBox="0 0 26 26"
@@ -65,14 +66,14 @@ export const OrganizationSelector: FC<{ asOpenSelect?: boolean }> = ({
               </svg>
             </div>
           )}
-          {data?.length > 1 && (
+          {list.length > 1 && (
             <div
               className={clsx(
                 'hidden py-[12px] px-[12px] group-hover:flex absolute top-[100%] end-0 bg-third border-tableBorder border gap-[12px] cursor-pointer flex-col',
                 asOpenSelect ? '!flex !relative max-w-[500px] mx-auto mb-[10px]' : '',
               )}
             >
-              {data?.map((org: { name: string; id: string }) => (
+              {list.map((org: { name: string; id: string }) => (
                 <div key={org.id} onClick={changeOrg(org)}>
                   {org.name}
                 </div>

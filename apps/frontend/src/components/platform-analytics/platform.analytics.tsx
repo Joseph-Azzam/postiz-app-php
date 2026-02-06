@@ -22,7 +22,7 @@ const allowedIntegrations = [
   'instagram',
   'instagram-standalone',
   'linkedin-page',
-  'tiktok',
+  // 'tiktok',
   'youtube',
   'gmb',
   'pinterest',
@@ -86,7 +86,6 @@ export const PlatformAnalytics = () => {
         'threads',
         'gmb',
         'x',
-        'tiktok',
       ].indexOf(currentIntegration.identifier) !== -1
     ) {
       arr.push({
@@ -105,7 +104,6 @@ export const PlatformAnalytics = () => {
         'threads',
         'gmb',
         'x',
-        'tiktok',
       ].indexOf(currentIntegration.identifier) !== -1
     ) {
       arr.push({

@@ -125,9 +125,10 @@ export const ThirdPartyListComponent: FC<{ reload: () => void }> = (props) => {
     []
   );
 
+  const list = Array.isArray(data) ? data : [];
   return (
     <div className="grid grid-cols-4 gap-[10px] justify-items-center justify-center">
-      {data?.map((p: any) => (
+      {list.map((p: any) => (
         <div
           onClick={addApiKey(p.title, p.identifier)}
           key={p.identifier}

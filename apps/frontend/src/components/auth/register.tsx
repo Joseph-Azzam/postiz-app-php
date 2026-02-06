@@ -22,7 +22,6 @@ import { FarcasterProvider } from '@gitroom/frontend/components/auth/providers/f
 import dynamic from 'next/dynamic';
 import { WalletUiProvider } from '@gitroom/frontend/components/auth/providers/placeholder/wallet.ui.provider';
 import { useT } from '@gitroom/react/translation/get.transation.service.client';
-import useCookie from 'react-use-cookie';
 const WalletProvider = dynamic(
   () => import('@gitroom/frontend/components/auth/providers/wallet.provider'),
   {
@@ -77,7 +76,7 @@ function getHelpfulReasonForRegistrationFailure(httpCode: number) {
     case 400:
       return 'Email already exists';
     case 404:
-      return 'Your browser got a 404 when trying to contact the API, the most likely reasons for this are the NEXT_PUBLIC_BACKEND_URL is set incorrectly, or the backend is not running.';
+      return 'Your browser got a 404 when trying to contact the API. Check that your backend URL (NEXT_PUBLIC_BACKEND_URL or NEXT_PUBLIC_LARAVEL_BACKEND_URL when using Laravel) is set correctly and the backend is running.';
   }
   return 'Unhandled error: ' + httpCode;
 }
@@ -95,7 +94,6 @@ export function RegisterAfter({
   const router = useRouter();
   const fireEvents = useFireEvents();
   const track = useTrack();
-  const [datafast_visitor_id] = useCookie('datafast_visitor_id');
   const isAfterProvider = useMemo(() => {
     return !!token && !!provider;
   }, [token, provider]);
@@ -116,7 +114,6 @@ export function RegisterAfter({
       method: 'POST',
       body: JSON.stringify({
         ...data,
-        datafast_visitor_id,
       }),
     })
       .then(async (response) => {
@@ -154,9 +151,7 @@ export function RegisterAfter({
               {t('sign_up', 'Sign Up')}
             </h1>
           </div>
-          <div className="text-[14px] mt-[32px] mb-[12px]">
-            {t('continue_with', 'Continue With')}
-          </div>
+          <div className="text-[14px] mt-[32px] mb-[12px]">{t('continue_with', 'Continue With')}</div>
           <div className="flex flex-col">
             {!isAfterProvider &&
               (!isGeneral ? (
@@ -178,7 +173,9 @@ export function RegisterAfter({
                 <div
                   className={`absolute z-[1] justify-center items-center w-full start-0 -top-[4px] flex`}
                 >
-                  <div className="px-[16px]">{t('or', 'or')}</div>
+                  <div className="px-[16px]">
+                    {t('or', 'or')}
+                  </div>
                 </div>
               </div>
             )}

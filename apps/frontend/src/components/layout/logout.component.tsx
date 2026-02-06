@@ -27,6 +27,8 @@ export const LogoutComponent = () => {
         await fetch('/user/logout', {
           method: 'POST',
         });
+        // Clear auth cookie on frontend origin (backend cannot clear cross-origin cookie).
+        setCookie('auth', '', -10);
       }
       window.location.href = '/';
     }

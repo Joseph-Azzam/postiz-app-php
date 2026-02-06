@@ -25,7 +25,6 @@ import { useUser } from '@gitroom/frontend/components/layout/user.context';
 import { useDubClickId } from '@gitroom/frontend/components/layout/dubAnalytics';
 import Image from 'next/image';
 import { useModals } from '@gitroom/frontend/components/layout/new-modal';
-import useCookie from 'react-use-cookie';
 
 const ModeComponent = dynamic(
   () => import('@gitroom/frontend/components/layout/mode.component'),
@@ -54,8 +53,6 @@ export const FirstBillingComponent = () => {
   const fetch = useFetch();
   const modals = useModals();
   const t = useT();
-  const [datafast_visitor_id] = useCookie('datafast_visitor_id', '');
-  const [datafast_session_id] = useCookie('datafast_session_id', '');
 
   useEffect(() => {
     setStripe(loadStripe(stripeClient));
@@ -68,9 +65,6 @@ export const FirstBillingComponent = () => {
         body: JSON.stringify({
           billing: tier,
           period: period,
-          ...(datafast_visitor_id && datafast_session_id
-            ? { datafast_visitor_id, datafast_session_id }
-            : {}),
           ...(dub ? { dub } : {}),
         }),
       })

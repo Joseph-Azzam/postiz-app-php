@@ -92,16 +92,22 @@ const LoadMessages: FC<{ id: string }> = ({ id }) => {
   const fetch = useFetch();
 
   const loadMessages = useCallback(async (idToSet: string) => {
-    const data = await (await fetch(`/copilot/${idToSet}/list`)).json();
-    setMessages(
-      data.uiMessages.map((p: any) => {
-        return new TextMessage({
-          content: p.content,
-          role: p.role,
-        });
-      })
-    );
-  }, []);
+    try {
+      const res = await fetch(`/copilot/${idToSet}/list`);
+      const data = typeof res.json === 'function' ? await res.json().catch(() => ({})) : {};
+      const list = Array.isArray(data?.uiMessages) ? data.uiMessages : [];
+      setMessages(
+        list.map((p: any) => {
+          return new TextMessage({
+            content: p?.content ?? '',
+            role: p?.role ?? 'user',
+          });
+        })
+      );
+    } catch {
+      setMessages([]);
+    }
+  }, [fetch, setMessages]);
 
   useEffect(() => {
     if (id === 'new') {
@@ -109,7 +115,7 @@ const LoadMessages: FC<{ id: string }> = ({ id }) => {
       return;
     }
     loadMessages(id);
-  }, [id]);
+  }, [id, loadMessages, setMessages]);
 
   return null;
 };

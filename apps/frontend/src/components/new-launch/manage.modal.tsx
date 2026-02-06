@@ -117,13 +117,33 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
       );
     }
 
-    const currentIntegration = integrations.find((p) => p.id === current)!;
+    const currentIntegration = integrations.find((p) => p.id === current);
+    const identifier = currentIntegration?.identifier ?? 'x';
+
+    if (!currentIntegration) {
+      return (
+        <div className="flex items-center gap-[10px]">
+          <div className="relative">
+            <img
+              src={`/icons/platforms/${identifier}.png`}
+              className="w-[20px] h-[20px] rounded-[4px]"
+              alt=""
+            />
+            <SettingsIcon
+              size={15}
+              className="text-white absolute -end-[5px] -bottom-[5px]"
+            />
+          </div>
+          <div>{t('channel_settings', 'Settings')}</div>
+        </div>
+      );
+    }
 
     return (
       <div className="flex items-center gap-[10px]">
         <div className="relative">
           <img
-            src={`/icons/platforms/${currentIntegration.identifier}.png`}
+            src={`/icons/platforms/${identifier}.png`}
             className="w-[20px] h-[20px] rounded-[4px]"
             alt={currentIntegration.identifier}
           />
@@ -137,7 +157,7 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
         </div>
       </div>
     );
-  }, [current]);
+  }, [current, integrations, t]);
 
   const changeCustomer = useCallback(
     (customer: string) => {
@@ -374,6 +394,9 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
         posts: checkAllValid.map((post: any) => ({
           integration: {
             id: post.integration.id,
+            name: post.integration.name ?? 'Unknown',
+            picture: post.integration.picture ?? '/no-picture.jpg',
+            identifier: post.integration.identifier ?? post.integration.providerIdentifier ?? 'x',
           },
           group,
           settings: { ...(post.settings || {}) },
@@ -449,6 +472,13 @@ export const ManageModal: FC<AddEditModalProps> = (props) => {
             <div className="bg-newBgColor h-[65px] rounded-s-[20px] !rounded-b-[0] flex items-center px-[20px] text-[20px] font-[600]">
               {t('create_post_title', 'Create Post')}
             </div>
+            {(existingData?.posts?.[0] as any)?.state === 'FAILED' &&
+              (existingData?.posts?.[0] as any)?.lastError && (
+              <div className="mx-[20px] mt-[12px] p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-sm">
+                <span className="font-semibold">{t('failed', 'Failed')}: </span>
+                {(existingData.posts[0] as any).lastError}
+              </div>
+            )}
             <div className="flex-1 flex flex-col gap-[16px]">
               <div
                 className={clsx('flex-1 relative', showSettings && 'hidden')}

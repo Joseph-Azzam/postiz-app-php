@@ -7,16 +7,17 @@
   "keywords": [],
   "author": "",
   "engines": {
-    "node": ">=22.12.0 <23.0.0"
+    "node": ">=20.0.0"
   },
   "packageManager": "pnpm@10.6.1",
   "scripts": {
+    "start": "pnpm dlx concurrently \"pnpm run start:prod:frontend\" \"pnpm run start:prod:backend\" \"pnpm run start:prod:orchestrator\"",
     "dev": "pnpm run --filter ./apps/extension --filter ./apps/orchestrator --filter ./apps/backend --filter ./apps/frontend --parallel dev",
     "pm2": "pnpm run pm2-run",
     "publish-sdk": "pnpm run --filter ./apps/sdk publish",
     "pm2-run": "pm2 delete all || true && pnpm run prisma-db-push && pnpm run --parallel pm2 && pm2 logs",
     "dev:stripe": "pnpm dlx concurrently \"stripe listen --forward-to localhost:3000/stripe\" \"pnpm run dev\"",
-    "build": "pnpm -r --workspace-concurrency=1 --filter ./apps/frontend --filter ./apps/backend --filter ./apps/orchestrator run build",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 pnpm -r --workspace-concurrency=1 --filter ./apps/frontend --filter ./apps/backend --filter ./apps/orchestrator run build",
     "build:backend": "rm -rf apps/backend/dist && pnpm --filter ./apps/backend run build",
     "build:frontend": "rm -rf apps/frontend/dist && pnpm --filter ./apps/frontend run build",
     "build:orchestrator": "rm -rf apps/orchestrator/dist && pnpm --filter ./apps/orchestrator run build",

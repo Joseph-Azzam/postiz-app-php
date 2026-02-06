@@ -56,7 +56,7 @@ export function useUppyUploader(props: {
       autoProceed: true,
       restrictions: {
         // maxNumberOfFiles: 5,
-        // allowedFileTypes: allowedFileTypes.split(','),
+        allowedFileTypes: allowedFileTypes.split(','),
         maxFileSize: 1000000000, // Default 1GB, but we'll override with custom validation
       },
     });
@@ -82,10 +82,7 @@ export function useUppyUploader(props: {
             ];
           }
           if (type === 'video/*') {
-            return ['video/mp4', 'video/mpeg', 'video/quicktime'];
-          }
-          if (type === 'video/mp4' && transloadit && transloadit.length > 0) {
-            return ['video/mp4', 'video/mpeg', 'video/quicktime'];
+            return ['video/mp4', 'video/mpeg'];
           }
           return [type];
         });
@@ -202,7 +199,6 @@ export function useUppyUploader(props: {
       props.onStart();
     });
     uppy2.on('complete', async (result) => {
-      console.log(result);
       for (const file of [...result.successful]) {
         uppy2.removeFile(file.id);
       }
@@ -226,13 +222,10 @@ export function useUppyUploader(props: {
         // @ts-ignore
         const allRes = result.transloadit[0].results;
         const toSave = uniqBy<{ name: string; order: number }>(
-          // @ts-ignore
-          Object.values(allRes).flatMap((p: any[]) => {
-            return p.flatMap((item) => ({
-              name: item.url.split('/').pop(),
-              order: +item.user_meta.addedOrder,
-            }));
-          }),
+          (allRes[Object.keys(allRes)[0]] || []).flatMap((item: any) => ({
+            name: item.url.split('/').pop(),
+            order: +item.user_meta.addedOrder,
+          })),
           (item) => item.name
         );
 

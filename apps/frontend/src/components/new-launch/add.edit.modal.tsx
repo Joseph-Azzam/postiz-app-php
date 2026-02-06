@@ -73,20 +73,28 @@ export const AddEditModalInner: FC<AddEditModalProps> = (props) => {
   useEffect(() => {
     if (props?.set?.posts?.length) {
       for (const post of props?.set?.posts) {
-        if (post.integration) {
+        if (post.integration?.id) {
           const integration = integrations.find(
             (i) => i.id === post.integration.id
           );
-          addOrRemoveSelectedIntegration(integration, post.settings);
+          if (integration) addOrRemoveSelectedIntegration(integration, post.settings);
         }
       }
     }
 
-    if (existingData.integration) {
+    if (existingData.posts?.length) {
+      for (const post of existingData.posts) {
+        const id = post.integrationId ?? (post as { integration?: { id: string } }).integration?.id;
+        if (id) {
+          const integration = integrations.find((i) => i.id === id);
+          if (integration) addOrRemoveSelectedIntegration(integration, (post as any).settings ?? {});
+        }
+      }
+    } else if (existingData.integration) {
       const integration = integrations.find(
         (i) => i.id === existingData.integration
       );
-      addOrRemoveSelectedIntegration(integration, existingData.settings);
+      if (integration) addOrRemoveSelectedIntegration(integration, existingData.settings);
     }
 
     if (props?.selectedChannels?.length) {
@@ -99,7 +107,7 @@ export const AddEditModalInner: FC<AddEditModalProps> = (props) => {
     }
   }, []);
 
-  if (existingData.integration && selectedIntegrations.length === 0) {
+  if ((existingData.integration || existingData.posts?.length) && selectedIntegrations.length === 0) {
     return null;
   }
 
@@ -133,7 +141,7 @@ export const AddEditModalInnerInner: FC<AddEditModalProps> = (props) => {
   );
 
   useEffect(() => {
-    if (existingData.integration) {
+    if (existingData.integration || existingData.posts?.length) {
       if (existingData?.posts?.[0]?.intervalInDays) {
         setRepeater(existingData.posts[0].intervalInDays);
       }
@@ -144,24 +152,49 @@ export const AddEditModalInnerInner: FC<AddEditModalProps> = (props) => {
           value: p.tag.name,
         })) || []
       );
-      addInternalValue(
-        0,
-        existingData.integration,
-        existingData.posts.map((post) => ({
-          delay: post.delay,
-          content:
-            post.content.indexOf('<p>') > -1
-              ? post.content
-              : post.content
-                  .split('\n')
-                  .map((line: string) => `<p>${line}</p>`)
-                  .join(''),
-          id: post.id,
-          // @ts-ignore
-          media: post.image as any[],
-        }))
-      );
-      setCurrent(existingData.integration);
+      const posts = existingData.posts ?? [];
+      if (posts.length > 0) {
+        posts.forEach((post: any) => {
+          const integrationId = post?.integration?.id;
+          if (integrationId) {
+            addInternalValue(
+              0,
+              integrationId,
+              [{
+                delay: post.delay,
+                content:
+                  post.content?.indexOf('<p>') > -1
+                    ? post.content
+                    : (post.content ?? '')
+                        .split('\n')
+                        .map((line: string) => `<p>${line}</p>`)
+                        .join(''),
+                id: post.id,
+                media: post.image ?? [],
+              }]
+            );
+          }
+        });
+        setCurrent(posts[0]?.integrationId ?? (posts[0] as { integration?: { id: string } })?.integration?.id ?? existingData.integration);
+      } else if (existingData.integration) {
+        addInternalValue(
+          0,
+          existingData.integration,
+          existingData.posts.map((post: any) => ({
+            delay: post.delay,
+            content:
+              post.content?.indexOf('<p>') > -1
+                ? post.content
+                : (post.content ?? '')
+                    .split('\n')
+                    .map((line: string) => `<p>${line}</p>`)
+                    .join(''),
+            id: post.id,
+            media: post.image ?? [],
+          }))
+        );
+        setCurrent(existingData.integration);
+      }
     } else {
       setEditor('normal');
     }

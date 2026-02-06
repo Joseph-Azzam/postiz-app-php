@@ -5,8 +5,13 @@ dist
 tmp
 /out-tsc
 .env
-# dependencies
+.env.local
+.env.production
+# dependencies (package manager – do not commit)
 node_modules
+**/node_modules
+**/vendor
+vendor
 
 # IDEs and editors
 /.idea
@@ -29,6 +34,7 @@ node_modules
 /.sass-cache
 /connect.lock
 /coverage
+**/coverage
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log
@@ -41,6 +47,9 @@ Thumbs.db
 
 .nx/cache
 .nx/workspace-data
+.turbo
+.cache
+.pnpm-store
 
 # Next.js
 .next
@@ -53,8 +62,14 @@ Thumbs.db
 *.orig
 *.~*~
 *.tsbuildinfo
+_tmp_*
+build.log
+reports/
+Untitled
 
 # ignore Secrets folder
 .secrets/
-libraries/plugins/src/plugins.ts
 i18n.cache
+
+# Libraries – only generated file (rest is source, keep in Git)
+libraries/plugins/src/plugins.ts

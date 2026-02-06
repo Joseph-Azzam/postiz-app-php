@@ -198,10 +198,10 @@ export const MenuGroupComponent: FC<
           !isOpen && 'hidden'
         )}
       >
-        {group.values.map((integration) => (
+        {group.values.map((integration, idx) => (
           <MenuComponent
             collapsed={collapsed}
-            key={integration.id}
+            key={integration.id ?? `channel-${idx}`}
             integration={integration}
             mutate={mutate}
             continueIntegration={continueIntegration}
@@ -256,7 +256,6 @@ export const MenuComponent: FC<
             'data-tooltip-content': integration.name,
           }
         : {})}
-      key={integration.id}
       className={clsx(
         'flex gap-[12px] items-center bg-newBgColorInner hover:bg-boxHover group/profile transition-all rounded-e-[8px]',
         integration.refreshNeeded && 'cursor-pointer'
@@ -562,11 +561,11 @@ export const LaunchesComponent = () => {
                   </div>
                 </div>
               )}
-              {menuIntegrations.map((menu) => (
+              {menuIntegrations.map((menu, index) => (
                 <MenuGroupComponent
                   collapsed={collapseMenu === '1'}
                   changeItemGroup={changeItemGroup}
-                  key={menu.name}
+                  key={`group-${index}-${menu.name}`}
                   group={menu}
                   mutate={mutate}
                   continueIntegration={continueIntegration}
